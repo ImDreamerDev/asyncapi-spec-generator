@@ -1,0 +1,319 @@
+asyncapi: 3.0.0
+info:
+  title: Demo BC AsyncApi
+  version: "1.0"
+  description: Automatically generated AsyncAPI specification for Demo
+servers:
+  ServiceBus:
+    host: bc-{ENVIRONMENT}-sbu.servicebus.windows.net
+    protocol: AMQP 1.0
+    description: Azure Service Bus for {ENVIRONMENT_LIFECYCLE} environment
+  CPQ:
+    host: https://cpq.com
+    protocol: AMQP 1.0
+    description: Azure Service Bus for EventDemoWithServer
+channels:
+  cpq-events:
+    address: cpq-events
+    description: ""
+    messages:
+      EventDemo:
+        $ref: '#/components/messages/EventDemo'
+  cpq-events-updates:
+    address: cpq-events-updates
+    description: ""
+    messages:
+      EventDemo2:
+        $ref: '#/components/messages/EventDemo2'
+  number-events:
+    address: number-events
+    description: ""
+    messages:
+      EventDemoWithServer:
+        $ref: '#/components/messages/EventDemoWithServer'
+operations:
+  cpq-events:
+    action: send
+    channel:
+      $ref: '#/channels/cpq-events'
+    summary: Sends messages to cpq-events on the host bc-{ENVIRONMENT}-sbu.servicebus.windows.net
+    messages:
+    - $ref: '#/channels/cpq-events/messages/EventDemo'
+  cpq-events-updates:
+    action: receive
+    channel:
+      $ref: '#/channels/cpq-events-updates'
+    summary: Receives messages from cpq-events-updates on the host bc-{ENVIRONMENT}-sbu.servicebus.windows.net
+    messages:
+    - $ref: '#/channels/cpq-events-updates/messages/EventDemo2'
+  number-events:
+    action: send
+    channel:
+      $ref: '#/channels/number-events'
+    summary: Sends messages to number-events on the host https://cpq.com
+    messages:
+    - $ref: '#/channels/number-events/messages/EventDemoWithServer'
+components:
+  messages:
+    EventDemo:
+      payload:
+        $ref: '#/components/schemas/EventDemo'
+    EventDemo2:
+      payload:
+        $ref: '#/components/schemas/EventDemo2'
+    EventDemoWithServer:
+      payload:
+        $ref: '#/components/schemas/EventDemoWithServer'
+  schemas:
+    EventDemo:
+      type:
+      - object
+      properties:
+        Id:
+          type: string
+          format: uuid
+        Name:
+          type: string
+        Date:
+          type: string
+          format: date
+        Number:
+          type: number
+          format: int32
+      additionalProperties: false
+    EventDemo_Nullable:
+      type:
+      - object
+      - "null"
+      properties:
+        Id:
+          type: string
+          format: uuid
+        Name:
+          type: string
+        Date:
+          type: string
+          format: date
+        Number:
+          type: number
+          format: int32
+      additionalProperties: false
+    Todo:
+      type:
+      - object
+      properties:
+        Title:
+          type: string
+        demo_description:
+          type:
+          - string
+          - "null"
+        text_done:
+          type: boolean
+      additionalProperties: false
+    TestStruct:
+      type:
+      - object
+      properties:
+        Name:
+          type: string
+        Number:
+          type: number
+          format: int32
+      additionalProperties: false
+    TestStruct_Nullable:
+      type:
+      - object
+      - "null"
+      properties:
+        Name:
+          type: string
+        Number:
+          type: number
+          format: int32
+      additionalProperties: false
+    EventDemo2:
+      type:
+      - object
+      properties:
+        Id:
+          type: string
+          description: The identifier of the event.
+          examples:
+          - 14c4700e-a6de-4e63-bcbb-cdb5185d264a
+          format: uuid
+        NullableId:
+          type:
+          - string
+          - "null"
+          format: uuid
+        Name:
+          type: string
+          description: The name of the event.
+          maxLength: 100
+          minLength: 10
+        NullableName:
+          type:
+          - string
+          - "null"
+          description: A nullable name of the event.
+          maxLength: 100
+          minLength: 10
+          examples:
+          - John
+          - Doe
+        DateTime:
+          type: string
+          format: date-time
+        NullableDateTime:
+          type:
+          - string
+          - "null"
+          format: date-time
+        DateTimeOffset:
+          type: string
+          format: date-time
+        NullableDateTimeOffset:
+          type:
+          - string
+          - "null"
+          format: date-time
+        Date:
+          type: string
+          format: date
+        NullableDate:
+          type:
+          - string
+          - "null"
+          format: date
+        Time:
+          type: string
+          format: time
+        NullableTime:
+          type:
+          - string
+          - "null"
+          format: time
+        Number:
+          type: number
+          format: int32
+        NullableNumber:
+          type:
+          - number
+          - "null"
+          format: int32
+        Complex:
+          type: object
+          $ref: '#/components/schemas/EventDemo'
+        NullableComplex:
+          type:
+          - object
+          - "null"
+          $ref: '#/components/schemas/EventDemo_Nullable'
+        Numbers:
+          type: array
+          items:
+            type: number
+            format: int32
+        NullableNumbersList:
+          type:
+          - array
+          - "null"
+          items:
+            type: number
+            format: int32
+        NumbersNullableList:
+          type: array
+          items:
+            type:
+            - number
+            - "null"
+            format: int32
+        Array:
+          type: array
+          items:
+            type: string
+        NullableArray:
+          type:
+          - array
+          - "null"
+          items:
+            type: string
+        StringNullableArray:
+          type: array
+          items:
+            type: string
+        Todo:
+          type: object
+          $ref: '#/components/schemas/Todo'
+        Enum:
+          type: string
+          enum:
+          - Int32
+          - Int64
+          - Float
+          - Double
+          - Byte
+          - Binary
+          - Date
+          - DateTime
+          - Password
+          - Email
+          - UUID
+          - Time
+          - Decimal
+          - Int16
+          - UInt16
+          - UInt32
+          - UInt64
+          - SByte
+          - Char
+        NullableEnum:
+          type:
+          - string
+          - "null"
+          enum:
+          - Int32
+          - Int64
+          - Float
+          - Double
+          - Byte
+          - Binary
+          - Date
+          - DateTime
+          - Password
+          - Email
+          - UUID
+          - Time
+          - Decimal
+          - Int16
+          - UInt16
+          - UInt32
+          - UInt64
+          - SByte
+          - Char
+        Struct:
+          type: object
+          $ref: '#/components/schemas/TestStruct'
+        NullableStruct:
+          type:
+          - object
+          - "null"
+          $ref: '#/components/schemas/TestStruct_Nullable'
+      additionalProperties: false
+    EventDemoWithServer:
+      type:
+      - object
+      properties:
+        Id:
+          type: string
+          format: uuid
+        Name:
+          type: string
+        Date:
+          type: string
+          format: date
+        Number:
+          type: number
+          format: int32
+      additionalProperties: false
