@@ -7,7 +7,7 @@ internal class BackstageDefinitionData(string bcName, string projectType, string
 {
     public string Type => "asyncapi";
     public string Lifecycle => "{ENVIRONMENT_LIFECYCLE}";
-    public string Owner => "ewii-it";
+    public string Owner => "{OWNER}";
     [YamlIgnore]
     public AsyncApiDefinition Definition { get; } = new AsyncApiDefinition(bcName, projectType, version);
     // Backstage expects the definition to be a string

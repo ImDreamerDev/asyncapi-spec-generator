@@ -28,7 +28,7 @@ public class AsyncEventGenerator_Should
 
         result.Spec.Type.ShouldBe("asyncapi");
         result.Spec.Lifecycle.ShouldBe("{ENVIRONMENT_LIFECYCLE}");
-        result.Spec.Owner.ShouldBe("owner");
+        result.Spec.Owner.ShouldBe("{OWNER}");
 
         result.Spec.Definition.AsyncApi.ShouldBe("3.0.0");
         result.Spec.Definition.Info.Title.ShouldBe(projectName.FirstCharToUpper() +" " + projectType.ToUpper() + " AsyncApi");
