@@ -98,7 +98,7 @@ internal class AsyncApiProperty(string[] types, AsyncApiDescriptionAttribute? de
     /// Omitting this keyword has the same behavior as a value of 0.
     /// <a href="https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-6.4.4">Source</a>
     /// </summary>
-    public int? Msetems { get; set; }
+    public int? MinItems { get; set; }
 
     /// <summary>
     /// The value of this keyword MUST be a boolean.
