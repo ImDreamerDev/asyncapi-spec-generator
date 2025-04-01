@@ -7,11 +7,11 @@
         <PackageProjectUrl>https://github.com/ImDreamerDev/asyncapi-spec-generator</PackageProjectUrl>
         <PackageTags>AsnycApi</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
-        <PackageVersion>1.0.0-alpha</PackageVersion>
+        <PackageVersion>1.1.0-alpha</PackageVersion>
         <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
