@@ -23,6 +23,7 @@ internal static class AsyncEventGenerator
 
             spec.Spec.Definition.AddFromType(asyncEventAttribute, type);
             addedTypes.Add(type.FullName!);
+            Console.WriteLine("Added '{0}' to AsyncApi spec", type.FullName);
         }
 
         Console.WriteLine("Found {0} types with AsyncEvent", addedTypes.Count);

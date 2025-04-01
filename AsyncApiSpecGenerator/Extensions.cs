@@ -79,10 +79,9 @@ internal static class Extensions
 
                     var typeName = split[1];
                     var splitTypeName = typeName.Split(',');
-                    return string.Join(',', splitTypeName[..1]);
+                    return string.Join(',', splitTypeName[..2]);
                 })
-                .ToArray());
-
+                .ToHashSet());
 
             Console.WriteLine("Error loading types from assembly: " + assembly.GetName().Name + " skipping..." + missingTypes + "\n");
             return e.Types.Where(t => t != null).ToArray()!;
