@@ -106,14 +106,12 @@ internal static class AsyncEventTypeHandler
             return result;
         }
 
-        if (type == typeof(ushort))
-        {
-            result.Format = AsyncApiFormat.UInt16;
-            return result;
-        }
+        if (type != typeof(ushort))
+            // We purposely return null here, as we want to handle the type in the next method
+            return null;
 
-        // We purposely return null here, as we want to handle the type in the next method
-        return null;
+        result.Format = AsyncApiFormat.UInt16;
+        return result;
     }
 
     private static AsyncApiProperty? HandleStringType(Type type, bool isNullable, bool nullableProperty, AsyncApiDescriptionAttribute? descriptionAttribute)
@@ -155,14 +153,12 @@ internal static class AsyncEventTypeHandler
             return result;
         }
 
-        if (type.IsEnum)
-        {
-            result.Enum = Enum.GetNames(type);
-            return result;
-        }
+        if (type.IsEnum is false)
+            // We purposely return null here, as we want to handle the type in the next method
+            return null;
 
-        // We purposely return null here, as we want to handle the type in the next method
-        return null;
+        result.Enum = Enum.GetNames(type);
+        return result;
     }
 
     private static AsyncApiProperty? HandleArrayType(Type type, AsyncApiComponents components, bool isNullable, bool nullableProperty, AsyncApiDescriptionAttribute? descriptionAttribute)
@@ -170,23 +166,22 @@ internal static class AsyncEventTypeHandler
         var result = Create("array", isNullable || nullableProperty, descriptionAttribute);
         switch (type.IsGenericType)
         {
-            case true when type.GetGenericTypeDefinition() == typeof(List<>):
-                result.Items = [ToAsyncApiSpecType(type.GetGenericArguments()[0], components)];
-                return result;
             case true when type.GetGenericTypeDefinition() == typeof(HashSet<>):
                 result.Items = [ToAsyncApiSpecType(type.GetGenericArguments()[0], components)];
                 result.UniqueItems = true;
                 return result;
+            case true when type.GetGenericTypeDefinition().InheritsOrImplements(typeof(IEnumerable<>)):
+                result.Items = [ToAsyncApiSpecType(type.GetGenericArguments()[0], components)];
+                return result;
         }
 
-        if (type.IsArray)
-        {
-            result.Items = [ToAsyncApiSpecType(type.GetElementType()!, components)];
-            return result;
-        }
+        if (type.IsArray is false)
+            // We purposely return null here, as we want to handle the type in the next method
+            return null;
 
-        // We purposely return null here, as we want to handle the type in the next method
-        return null;
+        result.Items = [ToAsyncApiSpecType(type.GetElementType()!, components)];
+        return result;
+
     }
 
     private static AsyncApiProperty HandleClassAndValueType(Type type, AsyncApiComponents components, bool isNullable, bool nullableProperty, AsyncApiDescriptionAttribute? descriptionAttribute)

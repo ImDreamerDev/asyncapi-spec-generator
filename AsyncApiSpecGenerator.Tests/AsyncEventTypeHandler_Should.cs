@@ -161,6 +161,50 @@ public class AsyncEventTypeHandler_Should
     }
 
     [Fact]
+    public void ToAsyncApiSpecType_IReadOnlyList()
+    {
+        var components = new AsyncApiComponents();
+        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(IReadOnlyList<int>), components);
+
+        components.Schemas.Count.ShouldBe(0);
+        typeInfo.Types.ShouldBe(["array"]);
+        typeInfo.Format.ShouldBeNull();
+    }
+
+    [Fact]
+    public void ToAsyncApiSpecType_IList()
+    {
+        var components = new AsyncApiComponents();
+        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(IList<int>), components);
+
+        components.Schemas.Count.ShouldBe(0);
+        typeInfo.Types.ShouldBe(["array"]);
+        typeInfo.Format.ShouldBeNull();
+    }
+
+    [Fact]
+    public void ToAsyncApiSpecType_ICollection()
+    {
+        var components = new AsyncApiComponents();
+        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(ICollection<int>), components);
+
+        components.Schemas.Count.ShouldBe(0);
+        typeInfo.Types.ShouldBe(["array"]);
+        typeInfo.Format.ShouldBeNull();
+    }
+
+    [Fact]
+    public void ToAsyncApiSpecType_IEnumerable()
+    {
+        var components = new AsyncApiComponents();
+        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(IEnumerable<int>), components);
+
+        components.Schemas.Count.ShouldBe(0);
+        typeInfo.Types.ShouldBe(["array"]);
+        typeInfo.Format.ShouldBeNull();
+    }
+
+    [Fact]
     public void ToAsyncApiSpecType_Array()
     {
         var components = new AsyncApiComponents();
@@ -337,8 +381,51 @@ public class AsyncEventTypeHandler_Should
     public void ToAsyncApiSpecType_NullableList()
     {
         var components = new AsyncApiComponents();
-        List<int>? list = new List<int>();
-        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(list.GetType(), components, true);
+        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(List<int>), components, true);
+
+        components.Schemas.Count.ShouldBe(0);
+        typeInfo.Types.ShouldBe(["array", "null"]);
+        typeInfo.Format.ShouldBeNull();
+    }
+
+    [Fact]
+    public void ToAsyncApiSpecType_NullableIReadOnlyList()
+    {
+        var components = new AsyncApiComponents();
+        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(IReadOnlyList<int>), components, true);
+
+        components.Schemas.Count.ShouldBe(0);
+        typeInfo.Types.ShouldBe(["array", "null"]);
+        typeInfo.Format.ShouldBeNull();
+    }
+
+    [Fact]
+    public void ToAsyncApiSpecType_NullableIList()
+    {
+        var components = new AsyncApiComponents();
+        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(IList<int>), components, true);
+
+        components.Schemas.Count.ShouldBe(0);
+        typeInfo.Types.ShouldBe(["array", "null"]);
+        typeInfo.Format.ShouldBeNull();
+    }
+
+    [Fact]
+    public void ToAsyncApiSpecType_NullableICollection()
+    {
+        var components = new AsyncApiComponents();
+        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(ICollection<int>), components, true);
+
+        components.Schemas.Count.ShouldBe(0);
+        typeInfo.Types.ShouldBe(["array", "null"]);
+        typeInfo.Format.ShouldBeNull();
+    }
+
+    [Fact]
+    public void ToAsyncApiSpecType_NullableIEnumerable()
+    {
+        var components = new AsyncApiComponents();
+        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(IEnumerable<int>), components, true);
 
         components.Schemas.Count.ShouldBe(0);
         typeInfo.Types.ShouldBe(["array", "null"]);
@@ -415,7 +502,7 @@ public class AsyncEventTypeHandler_Should
         components.Schemas.Count.ShouldBe(0);
         typeInfo.Types.ShouldBe(["array"]);
         typeInfo.Format.ShouldBeNull();
-        typeInfo.Items.Length.ShouldBe(1);
+        typeInfo.Items!.Length.ShouldBe(1);
         typeInfo.UniqueItems = true;
         typeInfo.Items[0].Types.ShouldBe(["number"]);
     }
@@ -448,7 +535,7 @@ public class AsyncEventTypeHandler_Should
     public void ToAsyncApiSpecType_ComplexType()
     {
         var components = new AsyncApiComponents();
-        var typeInfo = AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(EventDemo2), components);
+        AsyncEventTypeHandler.ToAsyncApiSpecType(typeof(EventDemo2), components);
 
         components.Schemas.Count.ShouldBe(6);
         components.Schemas["EventDemo2"].Types.ShouldBe(["object"]);

@@ -1,7 +1,9 @@
 using AsyncApiSpecGenerator.Attributes;
+using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 namespace AsyncApiSpecGenerator.Models.AsyncApi;
 
+[SuppressMessage("Performance", "CA1822:Mark members as static")]
 internal class AsyncApiDefinition
 {
     [YamlMember(Alias = "asyncapi")]
@@ -83,6 +85,7 @@ internal class AsyncApiDefinition
     private void CreateOperations(AsyncEventAttribute attribute, Type asyncEvent)
     {
         var serverHost = string.IsNullOrEmpty(attribute.ServerName) is false && Servers.TryGetValue(attribute.ServerName, out var server) ? server.Host : Servers.First().Value.Host;
+
         switch (attribute.OperationType)
         {
             case AsyncApiOperationType.None:
@@ -138,7 +141,7 @@ internal class AsyncApiDefinition
                 );
                 break;
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(attribute));
         }
     }
 }

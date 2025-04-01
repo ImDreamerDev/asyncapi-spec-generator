@@ -8,7 +8,7 @@ namespace AsyncApiSpecGenerator.Tests;
 internal class EventDemo
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public DateOnly Date { get; set; }
     public int Number { get; set; }
 }
@@ -20,7 +20,7 @@ internal class EventDemo2
     public Guid Id { get; set; }
     public Guid? NullableId { get; set; }
     [AsyncApiDescription(Description = "The name of the event.", MinLength = 10, MaxLength = 100)]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     [AsyncApiDescription(Description = "A nullable name of the event.", Examples = ["John", "Doe"], MinLength = 10, MaxLength = 100)]
     public string? NullableName { get; set; }
     public DateTime DateTime { get; set; }
@@ -33,15 +33,15 @@ internal class EventDemo2
     public TimeOnly? NullableTime { get; set; }
     public int Number { get; set; }
     public int? NullableNumber { get; set; }
-    public EventDemo Complex { get; set; }
+    public EventDemo Complex { get; set; } = null!;
     public EventDemo? NullableComplex { get; set; }
-    public List<int> Numbers { get; set; }
+    public List<int> Numbers { get; set; } = null!;
     public List<int>? NullableNumbersList { get; set; }
-    public List<int?> NumbersNullableList { get; set; }
-    public string[] Array { get; set; }
+    public List<int?> NumbersNullableList { get; set; } = null!;
+    public string[] Array { get; set; } = null!;
     public string[]? NullableArray { get; set; }
-    public string?[] StringNullableArray { get; set; }
-    public Todo Todo { get; set; }
+    public string?[] StringNullableArray { get; set; } = null!;
+    public Todo Todo { get; set; } = null!;
     public AsyncApiFormat Enum { get; set; }
     public AsyncApiFormat? NullableEnum { get; set; }
     public TestStruct Struct { get; set; }
@@ -51,7 +51,7 @@ internal class EventDemo2
 public class Todo
 {
     [JsonProperty("demo_title")]
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
     [JsonPropertyName("demo_description")]
     public string? Description { get; set; }
     [JsonProperty("newton_done")][JsonPropertyName("text_done")]
@@ -68,15 +68,15 @@ public struct TestStruct
 internal class EventDemoWithServer
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public DateOnly Date { get; set; }
     public int Number { get; set; }
 }
 
 internal class MultipleClasses
 {
-    public EventDemo EventDemo { get; set; }
-    public EventDemo EventDemo2 { get; set; }
+    public EventDemo EventDemo { get; set; } = null!;
+    public EventDemo EventDemo2 { get; set; } = null!;
 }
 
 internal class MultipleStructs

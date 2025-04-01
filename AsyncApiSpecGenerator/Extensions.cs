@@ -74,13 +74,48 @@ internal static class Extensions
         }
     }
 
-    public static string FirstCharToUpper(this string input) =>
+    internal static string FirstCharToUpper(this string input) =>
         input switch
         {
             null => throw new ArgumentNullException(nameof(input)),
             "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
             _ => string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1))
         };
+
+    internal static bool InheritsOrImplements(this Type child, Type parent)
+    {
+        ArgumentNullException.ThrowIfNull(child);
+        ArgumentNullException.ThrowIfNull(parent);
+        
+        var currentChild = child.IsGenericType ? child.GetGenericTypeDefinition() : child;
+
+        while (currentChild != typeof(object))
+        {
+            if (parent == currentChild || HasAnyInterfaces(parent, currentChild))
+                return true;
+
+            currentChild = currentChild.BaseType is { IsGenericType: true }
+                ? currentChild.BaseType.GetGenericTypeDefinition()
+                : currentChild.BaseType;
+
+            if (currentChild == null)
+                return false;
+        }
+        return false;
+    }
+
+    private static bool HasAnyInterfaces(Type parent, Type child)
+    {
+        return child.GetInterfaces()
+            .Any(childInterface =>
+            {
+                var currentInterface = childInterface.IsGenericType
+                    ? childInterface.GetGenericTypeDefinition()
+                    : childInterface;
+
+                return currentInterface == parent;
+            });
+    }
 }
 
 internal class ProgramLoadContext(string path) : AssemblyLoadContext

@@ -1,11 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <Authors>Vanessa Valery Vinther</Authors>
+        <Description>An AsyncApi spec generator.</Description>
+        <PackageProjectUrl>https://github.com/ImDreamerDev/asyncapi-spec-generator</PackageProjectUrl>
+        <PackageTags>AsnycApi</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <RootNamespace>AsyncApiSpecGenerator</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <PackageVersion>1.0.1-alpha</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>

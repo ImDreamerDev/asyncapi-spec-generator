@@ -8,10 +8,10 @@ public class AsyncEventGenerator_Should
     public void Generate()
     {
         // Arrange
-        var projectName = "Test";
-        var projectType = "BC";
+        const string projectName = "Test";
+        const string projectType = "BC";
         var types = typeof(AsyncEventGenerator_Should).Assembly.GetTypes();
-        var version = "1.0";
+        const string version = "1.0";
 
         // Act
         var result = AsyncEventGenerator.GenerateEvents(projectName, types, projectType, version);

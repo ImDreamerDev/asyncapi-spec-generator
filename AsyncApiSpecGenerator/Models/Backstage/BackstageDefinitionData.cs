@@ -1,8 +1,10 @@
 using AsyncApiSpecGenerator.Models.AsyncApi;
+using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 namespace AsyncApiSpecGenerator.Models.Backstage;
 
+[SuppressMessage("Performance", "CA1822:Mark members as static")]
 internal class BackstageDefinitionData(string bcName, string projectType, string version)
 {
     public string Type => "asyncapi";
