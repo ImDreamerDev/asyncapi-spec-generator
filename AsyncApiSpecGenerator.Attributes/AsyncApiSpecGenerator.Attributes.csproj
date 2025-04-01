@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <PackageId>IAmDreamerDev.AsyncApiSpecGenerator.Attributes</PackageId>
         <Authors>Vanessa Valery Vinther</Authors>
         <Description>This is the attributes used for AsyncApiSpecGenerator.</Description>
         <PackageProjectUrl>https://github.com/ImDreamerDev/asyncapi-spec-generator</PackageProjectUrl>
