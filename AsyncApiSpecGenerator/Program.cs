@@ -43,7 +43,7 @@ public class Program
             return;
         }
 
-        var workingPath = BuildDllPath(projectPath);
+        var workingPath = BuildDllPath(projectPath) ?? BuildProject(projectPath);
 
         var apiLoader = new ProgramLoadContext(workingPath);
         var asm = apiLoader.LoadFromAssemblyPath(workingPath);
@@ -91,27 +91,43 @@ public class Program
         return args[index + 1];
     }
 
-    private static string BuildDllPath(string path)
+    private static string? BuildDllPath(string path)
     {
         var workingPath = Path.GetFullPath(path);
 
         var fileName = Path.GetFileName(workingPath);
 
-        var releaseDllPath = Path.Combine(workingPath, "bin", "Release", "net8.0", fileName + ".dll");
-        var debugDllPath = Path.Combine(workingPath, "bin", "Debug", "net8.0", fileName + ".dll");
-
-        if (File.Exists(releaseDllPath))
+        var releasePath = Path.Combine(workingPath, "bin", "Release");
+        if (Path.Exists(releasePath))
         {
-            return releaseDllPath;
+            var newestReleasePath = Directory.GetDirectories(releasePath)
+                .Select(d => new DirectoryInfo(d))
+                .OrderByDescending(d => d.LastWriteTime)
+                .FirstOrDefault();
+            var releaseDllPath = Path.Combine(newestReleasePath?.FullName ?? "", fileName + ".dll");
+
+            if (File.Exists(releaseDllPath))
+            {
+                return releaseDllPath;
+            }
         }
 
-        if (File.Exists(debugDllPath))
+        var debugPath = Path.Combine(workingPath, "bin", "Debug");
+        if (Path.Exists(debugPath))
         {
-            return debugDllPath;
+            var newestDebugPath = Directory.GetDirectories(debugPath)
+                .Select(d => new DirectoryInfo(d))
+                .OrderByDescending(d => d.LastWriteTime)
+                .FirstOrDefault();
+            var debugDllPath = Path.Combine(newestDebugPath?.FullName ?? "", fileName + ".dll");
+
+            if (File.Exists(debugDllPath))
+            {
+                return debugDllPath;
+            }
         }
 
-        // Try and build the project
-        return BuildProject(workingPath);
+        return null;
     }
 
     private static void PrintUsage()
@@ -142,21 +158,14 @@ public class Program
         }
 
         Console.WriteLine("Project built successfully");
-        var fileName = Path.GetFileName(workingPath);
 
-        var releaseDllPath = Path.Combine(workingPath, "bin", "Release", "net8.0", fileName + ".dll");
-        var debugDllPath = Path.Combine(workingPath, "bin", "Debug", "net8.0", fileName + ".dll");
+        var buildPath = BuildDllPath(path);
 
-        if (File.Exists(releaseDllPath))
+        if (buildPath != null)
         {
-            return releaseDllPath;
+            return buildPath;
         }
 
-        if (File.Exists(debugDllPath))
-        {
-            return debugDllPath;
-        }
-
-        throw new FileNotFoundException("Unable to find release or debug DLL, make sure that you have built the project. Path was for release: " + releaseDllPath + " and for debug: " + debugDllPath);
+        throw new FileNotFoundException("Unable to find release or debug DLL, make sure that you have built the project.");
     }
 }
