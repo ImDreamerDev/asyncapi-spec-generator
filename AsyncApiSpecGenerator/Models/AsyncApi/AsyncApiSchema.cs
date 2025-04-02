@@ -1,9 +1,11 @@
+using System.Text.Json.Serialization;
 using YamlDotNet.Serialization;
 namespace AsyncApiSpecGenerator.Models.AsyncApi;
 
 internal class AsyncApiSchema(string[] types)
 {
     [YamlMember(Alias = "type")]
+    [JsonPropertyName("type")]
     public string[] Types { get; } = types;
     public Dictionary<string, AsyncApiProperty> Properties { get; init; } = new Dictionary<string, AsyncApiProperty>();
 

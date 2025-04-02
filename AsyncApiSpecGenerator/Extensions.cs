@@ -3,6 +3,7 @@ using AsyncApiSpecGenerator.Models.AsyncApi;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -30,6 +31,20 @@ internal static class Extensions
             .WithQuotingNecessaryStrings()
             .WithNewLine("\n")
             .Build();
+    }
+    
+    internal static JsonSerializerOptions CreateJsonSerializerOptions()
+    {
+        return new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = true,
+            Converters =
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+            }
+        };
     }
 
     internal static Dictionary<string, AsyncApiProperty> ToAsyncApiProperties(this Type type, AsyncApiComponents components)

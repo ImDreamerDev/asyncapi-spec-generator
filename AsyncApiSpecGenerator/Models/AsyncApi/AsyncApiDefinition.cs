@@ -1,5 +1,6 @@
 using AsyncApiSpecGenerator.Attributes;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using YamlDotNet.Serialization;
 namespace AsyncApiSpecGenerator.Models.AsyncApi;
 
@@ -7,6 +8,7 @@ namespace AsyncApiSpecGenerator.Models.AsyncApi;
 internal class AsyncApiDefinition
 {
     [YamlMember(Alias = "asyncapi")]
+    [JsonPropertyName("asyncapi")]
     public string AsyncApi => "3.0.0";
     public AsyncApiInfo Info { get; }
     public Dictionary<string, AsyncApiServer> Servers { get; } = new Dictionary<string, AsyncApiServer>();

@@ -1,4 +1,5 @@
 using AsyncApiSpecGenerator.Attributes;
+using System.Text.Json.Serialization;
 using YamlDotNet.Serialization;
 namespace AsyncApiSpecGenerator.Models.AsyncApi;
 
@@ -10,9 +11,11 @@ internal class AsyncApiProperty(string[] types, AsyncApiDescriptionAttribute? de
     /// Since it doesn't display correctly as an array in the generated YAML.
     /// </summary>
     [YamlMember(Alias = "type")]
+    [JsonPropertyName("type")]
     public object Type => Types.Length == 1 ? Types[0] : Types;
 
     [YamlIgnore]
+    [JsonIgnore]
     public string[] Types { get; } = types ?? throw new ArgumentNullException(nameof(types));
 
     public string? Description { get; } = descriptionAttribute?.Description;
@@ -159,6 +162,7 @@ internal class AsyncApiProperty(string[] types, AsyncApiDescriptionAttribute? de
     /// Since it doesn't display correctly as an array in the generated YAML.
     /// </summary>
     [YamlMember(Alias = "items")]
+    [JsonPropertyName("items")]
     public object? Item => Items?.Length == 1 ? Items[0] : Items;
 
     /// <summary>
@@ -170,10 +174,13 @@ internal class AsyncApiProperty(string[] types, AsyncApiDescriptionAttribute? de
     /// <a href="https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-6.4.1">Source</a>
     /// </summary>
     [YamlIgnore]
+    [JsonIgnore]
     public AsyncApiProperty[]? Items { get; set; }
 
     public AsyncApiFormat? Format { get; set; }
+
     [YamlMember(Alias = "$ref")]
+    [JsonPropertyName("$ref")]
     public string? Ref { get; set; }
 
     /// <summary>

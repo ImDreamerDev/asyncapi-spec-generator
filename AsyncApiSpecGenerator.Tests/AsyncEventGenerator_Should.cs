@@ -77,7 +77,5 @@ public class AsyncEventGenerator_Should
 
 
         result.Spec.Definition.Components.Schemas.Count.ShouldBe(7);
-
-
     }
 }
