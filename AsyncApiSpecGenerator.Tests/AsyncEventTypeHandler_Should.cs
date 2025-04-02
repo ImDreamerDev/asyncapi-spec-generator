@@ -135,7 +135,7 @@ public class AsyncEventTypeHandler_Should
         components.Schemas.Count.ShouldBe(0);
         typeInfo.Types.ShouldBe(["string"]);
         typeInfo.Format.ShouldBeNull();
-        typeInfo.Enum.ShouldBe(Enum.GetNames(typeof(AsyncApiFormat)));
+        typeInfo.Enum.ShouldBe(Enum.GetNames<AsyncApiFormat>());
     }
 
     [Fact]
@@ -363,7 +363,7 @@ public class AsyncEventTypeHandler_Should
         components.Schemas.Count.ShouldBe(0);
         typeInfo.Types.ShouldBe(["string", "null"]);
         typeInfo.Format.ShouldBeNull();
-        typeInfo.Enum.ShouldBe(Enum.GetNames(typeof(AsyncApiFormat)));
+        typeInfo.Enum.ShouldBe(Enum.GetNames<AsyncApiFormat>());
     }
 
     [Fact]

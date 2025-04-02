@@ -181,7 +181,6 @@ internal static class AsyncEventTypeHandler
 
         result.Items = [ToAsyncApiSpecType(type.GetElementType()!, components)];
         return result;
-
     }
 
     private static AsyncApiProperty HandleClassAndValueType(Type type, AsyncApiComponents components, bool isNullable, bool nullableProperty, AsyncApiDescriptionAttribute? descriptionAttribute)

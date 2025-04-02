@@ -43,7 +43,13 @@ public class Program
             return;
         }
 
-        var workingPath = BuildDllPath(projectPath) ?? BuildProject(projectPath);
+        var workingPath = BuildDllPath(projectPath); /*?? BuildProject(projectPath);*/
+
+        if (workingPath is null)
+        {
+            Console.Error.WriteLine("Failed to find the DLL file. Please ensure the project is built.");
+            return;
+        }
 
         var apiLoader = new ProgramLoadContext(workingPath);
         var asm = apiLoader.LoadFromAssemblyPath(workingPath);
@@ -110,6 +116,12 @@ public class Program
             {
                 return releaseDllPath;
             }
+            
+            Console.WriteLine("Failed to find release DLL. Used: " + releaseDllPath);
+        }
+        else
+        {
+            Console.WriteLine("Failed to find release path. Used: " + releasePath);
         }
 
         var debugPath = Path.Combine(workingPath, "bin", "Debug");
@@ -125,6 +137,12 @@ public class Program
             {
                 return debugDllPath;
             }
+
+            Console.WriteLine("Failed to find debug DLL. Used: " + debugDllPath);
+        }
+        else
+        {
+            Console.WriteLine("Failed to find debug path. Used: " + debugPath);
         }
 
         return null;
