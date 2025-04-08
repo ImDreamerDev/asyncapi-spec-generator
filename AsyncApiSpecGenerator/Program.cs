@@ -1,5 +1,9 @@
 ﻿using AsyncApiSpecGenerator.Attributes;
+using DotNet.Testcontainers.Builders;
+using Microsoft.Extensions.Logging.Abstractions;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 
 namespace AsyncApiSpecGenerator;
@@ -8,7 +12,7 @@ public class Program
 {
     private static readonly HashSet<string> _checkedDlls = [];
 
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         if (args.Length == 0)
         {
@@ -27,6 +31,7 @@ public class Program
             Console.WriteLine("--env: The environment to use, e.g. dev, test, prod (optional)");
             Console.WriteLine("--lifecycle: The lifecycle of the project, e.g. dev, test, prod (optional)");
             Console.WriteLine("--owner: The owner of the project, e.g. team name (optional)");
+            Console.WriteLine("--noValidate: Skip validation");
             Console.WriteLine("--help: Show this help");
             return;
         }
@@ -88,12 +93,20 @@ public class Program
         {
             var options = Extensions.CreateJsonSerializerOptions();
             asyncApiOnly = JsonSerializer.Serialize(spec.Spec.Definition, options);
+            if (HasFlag(argsList, "--noValidate"))
+                await Validate(projectName, asyncApiOnly);
+            else
+                Console.WriteLine("Skipping validation");
             backstage = JsonSerializer.Serialize(spec, options);
         }
         else
         {
             var serializer = Extensions.CreateSerializer();
             asyncApiOnly = JsonSerializer.Serialize(spec.Spec.Definition);
+            if (HasFlag(argsList, "--noValidate"))
+                await Validate(projectName, asyncApiOnly);
+            else
+                Console.WriteLine("Skipping validation");
             backstage = serializer.Serialize(spec);
         }
 
@@ -249,10 +262,12 @@ public class Program
         {
             var fileName = Path.GetFileName(dll);
 
-            if (fileName.Contains(projectName, StringComparison.InvariantCultureIgnoreCase) is false || _checkedDlls.Contains(fileName))
+            if (_checkedDlls.Add(fileName) is false)
                 continue;
 
-            _checkedDlls.Add(fileName);
+            if (fileName.Contains(projectName, StringComparison.InvariantCultureIgnoreCase) is false)
+                continue;
+
             var loader = new ProgramLoadContext(dll);
             var asm = loader.LoadFromAssemblyPath(dll);
             Console.WriteLine("Loading assembly: " + fileName);
@@ -262,5 +277,37 @@ public class Program
         }
 
         return asyncEvents;
+    }
+
+    private static async Task Validate(string projectName, string spec)
+    {
+        var bytes = Encoding.Default.GetBytes(spec);
+
+        var container = new ContainerBuilder()
+            .WithImage("asyncapi/cli:latest")
+            .WithResourceMapping(bytes, "/config/" + projectName)
+            .WithCommand("validate", "/config/" + projectName)
+            .WithLogger(NullLogger.Instance)
+            .Build();
+
+        await container.StartAsync();
+
+        var exitCode = await container.GetExitCodeAsync();
+        var outLog = await container.GetLogsAsync(timestampsEnabled: false);
+        if (exitCode == 1)
+        {
+            var errors = outLog.Stdout.Split("Errors")[^1];
+            throw new ValidationException("Validation failed: " + errors);
+        }
+
+        if (exitCode != 0)
+        {
+            throw new Exception("Validation failed: " + outLog);
+        }
+
+        if (outLog.Stdout.Contains($"File /config/{projectName} is valid!") is false)
+            throw new Exception("Failed to validate: " + outLog);
+
+        Console.WriteLine("Validation succeeded");
     }
 }

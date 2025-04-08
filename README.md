@@ -40,6 +40,7 @@ AsyncApiSpecGenerator --projectPath Example.ADPT.Project.Api --projectPath Anoth
 | `--env`         | Specifies the environment (e.g., dev, test, prod) (optional).                            |
 | `--lifecycle`   | Defines the project lifecycle (e.g., dev, test, prod) (optional).                        |
 | `--owner`       | Sets the project owner (e.g., team name) (optional).                                     |
+| `--noValidate`  | Disables validation of the generated AsyncAPI specification.                             |
 | `--help`        | Displays help information.                                                               |
 
 🔧 Automatic Project Build
