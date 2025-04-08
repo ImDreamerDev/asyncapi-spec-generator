@@ -155,7 +155,7 @@ internal class AsyncApiProperty(string[] types, AsyncApiDescriptionAttribute? de
     /// If "examples" is absent, "default" MAY still be used in this manner.
     /// <a href="https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-10.4">Source</a>
     /// </summary>
-    public string[]? Examples { get; } = descriptionAttribute?.GetExamples();
+    public object[]? Examples { get; } = ToExample(types, descriptionAttribute);
 
     /// <summary>
     /// We are doing a hack here to support both single and multiple items.
@@ -191,4 +191,37 @@ internal class AsyncApiProperty(string[] types, AsyncApiDescriptionAttribute? de
     /// </summary>
     public string? Default { get; set; }
 
+    private static object[]? ToExample(string[] types, AsyncApiDescriptionAttribute? asyncApiDescriptionAttribute)
+    {
+        var examples = asyncApiDescriptionAttribute?.GetExamples();
+
+        if (examples is null || examples.Length is 0)
+            return null;
+
+        if (types.Contains("boolean"))
+        {
+            return examples.Select(x => bool.TryParse(x, out var result) && result).OfType<object>().ToArray();
+        }
+
+        if (types.Contains("number"))
+        {
+            return examples.Select<string, object?>(x =>
+            {
+                if (decimal.TryParse(x, out var result))
+                    return result;
+                if (long.TryParse(x, out var resultLong))
+                    return resultLong;
+                if (ulong.TryParse(x, out var resultULong))
+                    return resultULong;
+
+                return null;
+            }).OfType<object>().ToArray();
+        }
+
+        if (types.Contains("object") is false && types.Contains("array") is false)
+            return examples.OfType<object>().ToArray();
+
+        Console.Error.WriteLine("[WARN] Unsupported example type. Object and array are not supported. Please use examples on the field level.");
+        return null;
+    }
 }

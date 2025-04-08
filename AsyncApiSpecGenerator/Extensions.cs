@@ -54,21 +54,21 @@ internal static class Extensions
             .ToDictionary(
                 prop =>
                 {
-                    var nameAttribute = prop.GetCustomAttribute<JsonPropertyNameAttribute>();
-                    var newtonsoftNameAttribute = prop.GetCustomAttribute<Newtonsoft.Json.JsonPropertyAttribute>();
+                    var jsonPropertyNameAttribute = prop.GetCustomAttributesData().FirstOrDefault(data => data.AttributeType.FullName == "System.Text.Json.Serialization.JsonPropertyNameAttribute");
 
-                    if (nameAttribute is not null)
+                    if (jsonPropertyNameAttribute is not null)
                     {
-                        return nameAttribute.Name;
+                        return jsonPropertyNameAttribute.ConstructorArguments[0].Value!.ToString()!;
                     }
 
-                    if (newtonsoftNameAttribute?.PropertyName != null)
+                    var newtonsoftNameAttribute = prop.GetCustomAttributesData().FirstOrDefault(data => data.AttributeType.FullName == "Newtonsoft.Json.JsonPropertyAttribute");
+
+                    if (newtonsoftNameAttribute is not null)
                     {
-                        return newtonsoftNameAttribute.PropertyName;
+                        return newtonsoftNameAttribute.ConstructorArguments[0].Value!.ToString()!;
                     }
 
-
-                    return prop.Name;
+                    return prop.Name.FirstCharToLower();
                 },
                 prop => AsyncEventTypeHandler.ToAsyncApiSpecType(prop.PropertyType, components, prop.IsNullable(), prop.GetCustomAttribute<AsyncApiDescriptionAttribute>())
             );
@@ -110,6 +110,14 @@ internal static class Extensions
             "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
             _ => string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1))
         };
+    
+    internal static string FirstCharToLower(this string input) =>
+        input switch
+        {
+            null => throw new ArgumentNullException(nameof(input)),
+            "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
+            _ => string.Concat(input[0].ToString().ToLower(), input.AsSpan(1))
+        };
 
     internal static bool InheritsOrImplements(this Type child, Type parent)
     {
@@ -149,6 +157,7 @@ internal static class Extensions
 
 internal class ProgramLoadContext(string path) : AssemblyLoadContext
 {
+    private static readonly Dictionary<string, Assembly?> _loadedAssemblies = new Dictionary<string, Assembly?>();
     private readonly AssemblyDependencyResolver _resolver = new AssemblyDependencyResolver(path);
 
     protected override Assembly? Load(AssemblyName assemblyName)
@@ -159,8 +168,16 @@ internal class ProgramLoadContext(string path) : AssemblyLoadContext
             return null;
         }
 
+        if (_loadedAssemblies.TryGetValue(assemblyName.FullName, out var load))
+        {
+            return load;
+        }
+
         var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
 
-        return assemblyPath != null ? LoadFromAssemblyPath(assemblyPath) : null;
+        var result = assemblyPath != null ? LoadFromAssemblyPath(assemblyPath) : null;
+
+        _loadedAssemblies.Add(assemblyName.FullName, result);
+        return result;
     }
 }
