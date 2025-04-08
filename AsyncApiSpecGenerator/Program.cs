@@ -6,7 +6,9 @@ namespace AsyncApiSpecGenerator;
 
 public class Program
 {
-    public static async Task Main(string[] args)
+    private static readonly HashSet<string> _checkedDlls = [];
+
+    public static void Main(string[] args)
     {
         if (args.Length == 0)
         {
@@ -62,19 +64,9 @@ public class Program
                 continue;
             }
 
-            Console.WriteLine("Starting to process path: " + projectPath);
-            var workingPath = BuildDllPath(projectPath) ?? await BuildProject(projectPath);
-
-            var apiLoader = new ProgramLoadContext(workingPath);
-            var asm = apiLoader.LoadFromAssemblyPath(workingPath);
-            // Since the types are lazy loaded we need to load the assembly to get the types
-            asm.GetLoadableTypes();
-
-            types.AddRange(AppDomain.CurrentDomain
-                .GetAssemblies()
-                .SelectMany(a => a.GetLoadableTypes())
-                .Where(type => type.GetCustomAttribute<AsyncEventAttribute>() != null));
-            Console.WriteLine("Finished processing " + projectPath);
+            Console.WriteLine("Starting to process path: " + Path.GetFileName(projectPath));
+            types.AddRange(LoadTypes(projectPath, projectName));
+            Console.WriteLine("Finished processing " + Path.GetFileName(projectPath));
         }
 
         var spec = AsyncEventGenerator.GenerateEvents(projectName, types.ToArray(), projectType, version);
@@ -123,7 +115,7 @@ public class Program
         File.WriteAllText(fileNameSpec, asyncApiOnly);
         File.WriteAllText(fileNameBackstage, backstage);
 
-        Console.WriteLine($"Generated AsyncApi for {projectName} {projectType} {version} to {fileNameSpec}");
+        Console.WriteLine($"Generated AsyncApi for {projectName} {projectType} {version} to {Path.GetFullPath(fileNameSpec)}");
         Console.WriteLine($"Generated Backstage for {projectName} {projectType} {version} to {fileNameBackstage}");
     }
 
@@ -206,7 +198,7 @@ public class Program
         Console.WriteLine("Write --help for more information");
     }
 
-    private static async Task<string> BuildProject(string path)
+    private static string BuildProject(string path)
     {
         var workingPath = Path.GetFullPath(path);
         Console.WriteLine("Project not built, trying to build it");
@@ -227,7 +219,7 @@ public class Program
         process.Start();
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-        await process.WaitForExitAsync();
+        process.WaitForExit();
 
         if (process.ExitCode != 0)
         {
@@ -244,5 +236,31 @@ public class Program
         }
 
         throw new FileNotFoundException("Unable to find release or debug DLL, make sure that you have built the project.");
+    }
+
+    private static List<Type> LoadTypes(string projectPath, string projectName)
+    {
+        var asyncEvents = new List<Type>();
+        var workingPath = BuildDllPath(projectPath) ?? BuildProject(projectPath);
+
+        var path = Path.GetDirectoryName(workingPath)!;
+
+        foreach (var dll in Directory.GetFiles(path, "*.dll"))
+        {
+            var fileName = Path.GetFileName(dll);
+
+            if (fileName.Contains(projectName, StringComparison.InvariantCultureIgnoreCase) is false || _checkedDlls.Contains(fileName))
+                continue;
+
+            _checkedDlls.Add(fileName);
+            var loader = new ProgramLoadContext(dll);
+            var asm = loader.LoadFromAssemblyPath(dll);
+            Console.WriteLine("Loading assembly: " + fileName);
+            // Since the types are lazy loaded we need to load the assembly to get the types
+            var types = asm.GetLoadableTypes().Where(type => type.GetCustomAttribute<AsyncEventAttribute>() != null).ToList();
+            asyncEvents.AddRange(types);
+        }
+
+        return asyncEvents;
     }
 }

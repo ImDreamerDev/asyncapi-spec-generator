@@ -5,7 +5,7 @@ namespace AsyncApiSpecGenerator;
 
 internal static class AsyncEventGenerator
 {
-    internal static BackstageDefinition? GenerateEvents(string projectName, Type[] types, string projectType, string version)
+    internal static BackstageDefinition? GenerateEvents(string projectName, ICollection<Type> types, string projectType, string version)
     {
         var spec = new BackstageDefinition(projectName, projectType, version);
         var addedTypes = new HashSet<string>();
